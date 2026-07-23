@@ -10,26 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
 
-    - name: Push to Hugging Face
-      env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          git clone https://mabrudan:${HF_TOKEN}@huggingface.co/spaces/mabrudan/promoter-predictor space
 
-      run: |
+          rsync -av --delete --exclude=".git" ./ space/
 
-        git config --global user.email "you@example.com"
-        git config --global user.name "GitHub"
+          cd space
 
-        git clone https://USER:$HF_TOKEN@huggingface.co/spaces/mabrudan/promoter-predictor space
+          git add .
 
-        rsync -av --exclude=".git" ./ space/
+          git commit -m "Automatic update" || echo "Nothing to commit"
 
-        cd space
-
-        git add .
-
-        git commit -m "Automatic update" || echo "Nothing to commit"
-
-        git push
+          git push origin main
