@@ -1,0 +1,35 @@
+name: Sync to Hugging Face
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Push to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+      run: |
+
+        git config --global user.email "you@example.com"
+        git config --global user.name "GitHub"
+
+        git clone https://USER:$HF_TOKEN@huggingface.co/spaces/mabrudan/promoter-predictor space
+
+        rsync -av --exclude=".git" ./ space/
+
+        cd space
+
+        git add .
+
+        git commit -m "Automatic update" || echo "Nothing to commit"
+
+        git push
