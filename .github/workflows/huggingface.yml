@@ -2,8 +2,7 @@ name: Sync to Hugging Face
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   sync:
@@ -19,14 +18,15 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
-          git clone https://mabrudan:${HF_TOKEN}@huggingface.co/spaces/mabrudan/promoter-predictor space
+          git clone https://mabrudan:${HF_TOKEN}@huggingface.co/spaces/mabrudan/promoter-predictor hf-space
 
-          rsync -av --delete --exclude=".git" ./ space/
+          rsync -av --delete \
+            --exclude=".git" \
+            --exclude="hf-space" \
+            ./ hf-space/
 
-          cd space
+          cd hf-space
 
           git add .
-
           git commit -m "Automatic update" || echo "Nothing to commit"
-
-          git push origin main
+          git push
